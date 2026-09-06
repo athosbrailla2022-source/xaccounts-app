@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<link rel="manifest" href="manifest.json">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Matrix FF VIP Purple Edition</title>
+    <style>
+        :root {
+            --bg-base: #09060f;
+            --bg-panel: #130d1f;
+            --accent: #a855f7;
+            --accent-glow: rgba(168, 85, 247, 0.4);
+            --danger: #ff2a5f;
+            --text-main: #f4f4f6;
+            --text-dim: #8c82a0;
+            --border: #271a3d;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-base);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 12px;
+        }
+
+        .phone-frame {
+            width: 100%;
+            max-width: 420px;
+            height: 840px;
+            background-color: var(--bg-panel);
+            border: 2px solid var(--border);
+            border-radius: 36px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), inset 0 0 15px rgba(168, 85, 247, 0.05);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), height 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .phone-frame.minimized {
+            height: 95px !important;
+            overflow: hidden;
+            border-color: var(--accent);
+            box-shadow: 0 0 25px var(--accent-glow);
+        }
+
+        .phone-frame.minimized .content,
+        .phone-frame.minimized nav.bottom-nav,
+        .phone-frame.minimized header .status-badge,
+        .phone-frame.minimized header .logo span,
+        .phone-frame.minimized .notch {
+            display: none !important;
+        }
+
+        .phone-frame.minimized header {
+            padding: 16px 20px;
+            border-bottom: none;
+            justify-content: center;
+            height: 100%;
+        }
+
+        .phone-frame.minimized header .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+        }
+
+        .phone-frame.minimized header .logo img {
+            width: 50px;
+            height: 50px;
+            animation: pulse-logo 2s infinite;
+        }
+
+        .phone-frame.minimized header .logo h1 {
+            font-size: 1rem;
+            color: var(--accent);
+        }
+
+        .notch {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 130px;
+            height: 22px;
+            background-color: var(--bg-base);
+            border-bottom-left-radius: 12px;
+            border-bottom-right-radius: 12px;
+            z-index: 10;
+        }
+
+        header {
+            padding: 36px 20px 16px 20px;
+            background: linear-gradient(180deg, rgba(19,13,31,1) 0%, rgba(9,6,15,0) 100%);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
+        }
+
+        header .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+        }
+
+        header .logo img {
+            width: 42px;
+            height: 42px;
+            border-radius: 10px;
+            object-fit: cover;
+            border: 1px solid var(--accent);
+            box-shadow: 0 0 12px var(--accent-glow);
+            transition: transform 0.2s;
+        }
+
+        header .logo img:hover {
+            transform: scale(1.05);
+        }
+
+        header .logo h1 {
+            font-size: 1.05rem;
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        header .logo span {
+            display: block;
+            font-size: 0.65rem;
+            color: var(--text-dim);
+            letter-spacing: 2px;
+        }
+
+        .status-badge {
+            background: rgba(168, 85, 247, 0.1);
+            border: 1px solid var(--accent);
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.65rem;
+            color: var(--accent);
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+        }
+
+        .content::-webkit-scrollbar {
+            width: 4px;
+        }
+        .content::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 2px;
+        }
+
+        .section-title {
+            font-size: 0.7rem;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-bottom: 10px;
+            margin-top: 10px;
+        }
+
+        .module-card {
+            background-color: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 14px;
+            margin-bottom: 12px;
+            transition: all 0.2s ease;
+        }
+
+        .module-card:hover {
+            border-color: rgba(168, 85, 247, 0.3);
+        }
+
+        .module-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .module-header h3 {
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 44px;
+            height: 24px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: var(--border);
+            transition: .3s;
+            border-radius: 24px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: var(--text-main);
+            transition: .3s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: var(--accent);
+            box-shadow: 0 0 10px var(--accent-glow);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(20px);
+            background-color: #000;
+        }
+
+        .module-desc {
+            font-size: 0.75rem;
+            color: var(--text-dim);
+            line-height: 1.4;
+        }
+
+        .slider-group {
+            margin-top: 10px;
+        }
+
+        .slider-group label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.75rem;
+            color: var(--text-dim);
+            margin-bottom: 4px;
+        }
+
+        .slider-group label span {
+            color: var(--accent);
+            font-weight: bold;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            appearance: none;
+            height: 4px;
+            background: var(--border);
+            border-radius: 2px;
+            outline: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            appearance: none;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: var(--accent);
+            cursor: pointer;
+            box-shadow: 0 0 8px var(--accent-glow);
+        }
+
+        .action-button {
+            width: 100%;
+            background: linear-gradient(135deg, #a855f7 0%, #7e22ce 100%);
+            color: #fff;
+            border: none;
+            border-radius: 12px;
+            padding: 14px;
+            font-weight: bold;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            box-shadow: 0 4px 20px var(--accent-glow);
+            transition: opacity 0.2s;
+            margin-top: 8px;
+        }
+
+        .action-button:active {
+            opacity: 0.8;
+        }
+
+        .console-output {
+            background-color: #05030a;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 10px;
+            font-family: monospace;
+            font-size: 0.65rem;
+            color: var(--text-dim);
+            height: 75px;
+            overflow-y: auto;
+            margin-top: 12px;
+        }
+
+        .console-log {
+            margin-bottom: 3px;
+        }
+
+        .console-success {
+            color: var(--accent);
+        }
+
+        nav.bottom-nav {
+            background-color: var(--bg-base);
+            border-top: 1px solid var(--border);
+            height: 60px;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+        }
+
+        .nav-item {
+            background: none;
+            border: none;
+            color: var(--text-dim);
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .nav-item.active {
+            color: var(--accent);
+            font-weight: bold;
+        }
+
+        @keyframes pulse-logo {
+            0% { box-shadow: 0 0 0 0 rgba(168, 85, 247, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(168, 85, 247, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(168, 85, 247, 0); }
+        }
+    </style>
+</head>
+<body>
+    <div class="phone-frame" id="phoneFrame">
+        <div class="notch"></div>
+
+        <header>
+            <div class="logo" id="logoToggle" title="Clique para Minimizar / Aumentar">
+                <img src="https://i.imgur.5EAwsoc.png" alt="Logo" onerror="this.src='https://i.imgur.com/5EAwsoc.png'">
+                <div>
+                    <h1>Matrix FF</h1>
+                    <span>VIP Purple Edition</span>
+                </div>
+            </div>
+            <div class="status-badge" id="sysStatus">Pronto</div>
+        </header>
+
+        <div class="content">
+            <div class="section-title">Núcleo de Assistência de Mira</div>
+            <div class="module-card">
+                <div class="module-header">
+                    <h3>Trava Cabeça 80%</h3>
+                    <label class="switch">
+                        <input type="checkbox" id="hsToggle" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="module-desc">Puxada magnética dinâmica ajustada milimetricamente para a região cervical.</div>
+                <div class="slider-group">
+                    <label>Intensidade de Correção <span id="hsVal">80%</span></label>
+                    <input type="range" id="hsSlider" min="50" max="95" value="80">
+                </div>
+            </div>
+
+            <div class="section-title">Otimização de Hardware</div>
+            <div class="module-card">
+                <div class="module-header">
+                    <h3>Acelerador de Toque</h3>
+                    <label class="switch">
+                        <input type="checkbox" id="touchToggle" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="module-desc">Maximiza a taxa de polling da tela e reduz o atraso de resposta ao deslizar.</div>
+            </div>
+
+            <div class="module-card">
+                <div class="module-header">
+                    <h3>Limpeza de RAM e Estabilizador de Ping</h3>
+                    <label class="switch">
+                        <input type="checkbox" id="ramToggle" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="module-desc">Encerra processos em segundo plano e prioriza os pacotes de rede do jogo.</div>
+            </div>
+
+            <button class="action-button" id="launchBtn">Injetar e Iniciar Jogo</button>
+
+            <div class="console-output" id="consoleLogs">
+                <div class="console-log">&gt; Estrutura Matrix inicializada com sucesso.</div>
+                <div class="console-log">&gt; Aguardando comando de execução...</div>
+            </div>
+        </div>
+
+        <nav class="bottom-nav">
+            <button class="nav-item active">Matrix</button>
+            <button class="nav-item">Config</button>
+            <button class="nav-item">Status</button>
+        </nav>
+    </div>
+
+    <script>
+        const phoneFrame = document.getElementById('phoneFrame');
+        const logoToggle = document.getElementById('logoToggle');
+        const hsSlider = document.getElementById('hsSlider');
+        const hsVal = document.getElementById('hsVal');
+        const launchBtn = document.getElementById('launchBtn');
+        const consoleLogs = document.getElementById('consoleLogs');
+        const sysStatus = document.getElementById('sysStatus');
+
+        // Minimizar e Aumentar clicando na logo
+        logoToggle.addEventListener('click', () => {
+            phoneFrame.classList.toggle('minimized');
+            if(phoneFrame.classList.contains('minimized')) {
+                logMessage("Painel minimizado na barra flutuante.");
+            } else {
+                logMessage("Painel expandido.");
+            }
+        });
+
+        hsSlider.addEventListener('input', (e) => {
+            hsVal.textContent = e.target.value + '%';
+        });
+
+        function logMessage(text, isSuccess = false) {
+            const div = document.createElement('div');
+            div.className = `console-log ${isSuccess ? 'console-success' : ''}`;
+            div.textContent = `> ${text}`;
+            consoleLogs.appendChild(div);
+            consoleLogs.scrollTop = consoleLogs.scrollHeight;
+        }
+
+        launchBtn.addEventListener('click', () => {
+            launchBtn.disabled = true;
+            launchBtn.style.opacity = '0.5';
+            sysStatus.textContent = 'Injetando';
+            sysStatus.style.borderColor = '#ff2a5f';
+            sysStatus.style.color = '#ff2a5f';
+
+            logMessage("Mapeando regiões de memória...");
+            setTimeout(() => {
+                logMessage("Aplicando vetores de offset para 80% HS...", true);
+            }, 350);
+            setTimeout(() => {
+                logMessage("Taxa de resposta ao toque acelerada para o máximo [OK]", true);
+            }, 700);
+            setTimeout(() => {
+                logMessage("Ganchos de jogo assegurados. Pronto para a partida.", true);
+                sysStatus.textContent = 'Ativo';
+                sysStatus.style.borderColor = 'var(--accent)';
+                sysStatus.style.color = 'var(--accent)';
+                launchBtn.disabled = false;
+                launchBtn.style.opacity = '1';
+                launchBtn.textContent = 'Modo Matrix Ativo';
+            }, 1100);
+        });
+    </script>
+</body>
+</html>
